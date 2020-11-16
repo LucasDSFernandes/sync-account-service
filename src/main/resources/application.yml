@@ -1,0 +1,11 @@
+account:
+  file:
+    path: /file-account 
+    extension: .csv
+  formats-length:
+    agency: 4
+    account: 6
+#spring:
+#  output:
+#    ansi:
+#      enabled: always
