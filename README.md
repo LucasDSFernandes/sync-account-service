@@ -7,7 +7,7 @@ Para rodar o projeto, sigua as instruções:
     2 - Realize mvn clean install para gerar a sync-account-service-0.0.1.jar em seu repositorio local
     3 - Execute o .jar como abaixo: 
 
-### Comando para rodar um jar vis cmd
+### Comando para rodar um jar via CMD
 
   1 - Na pasta onde esta o .jar abra seu CMD e realize o comando
   #### java -jar .\sync-account-service-0.0.1.jar <CAMINHO_PLANILHA> 
