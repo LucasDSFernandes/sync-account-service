@@ -19,7 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.lucasdsf.syncaccountservice.config.PropertiesFiles;
+import com.lucasdsf.syncaccountservice.config.PropertiesFile;
 import com.lucasdsf.syncaccountservice.constants.Constants;
 import com.lucasdsf.syncaccountservice.dto.AccountInfoDTO;
 import com.lucasdsf.syncaccountservice.enums.AccountFileEnum;
@@ -43,7 +43,7 @@ class CsvServiceImplTest {
 	private AccountFormat accountFormat;
 	
 	@MockBean
-	private PropertiesFiles propertiesMock;
+	private PropertiesFile propertiesMock;
 	
 	@Test
 	void testProcessFile() {
@@ -56,10 +56,10 @@ class CsvServiceImplTest {
 			BDDMockito.given(propertiesMock.getOutputFileName()).willReturn("testOut");
 			BDDMockito.given(propertiesMock.getOutputFileExtension()).willReturn("csv");
 			
-			BDDMockito.given(fileUtilMock.createOutputFile("testOut", "csv")).willReturn(outFilePath);
+			BDDMockito.given(fileUtilMock.getOutputFilePath("testOut", "csv")).willReturn(outFilePath);
 			
 			FileWriter fileWriter = new FileWriter(new File(outFilePath));
-			BDDMockito.given(fileUtilMock.appenndeWriterFile(fileWriter, getCsvHeader())).willReturn(fileWriter);
+			BDDMockito.given(fileUtilMock.appendFile(fileWriter, getCsvHeader())).willReturn(fileWriter);
 			BDDMockito.given(accountFormat.formatAgency( this.buildAccountInfoDto().getAgencia() )).willReturn( this.buildAccountInfoDto().getAgencia() );
 			BDDMockito.given(accountFormat.formatAccount( this.buildAccountInfoDto().getConta() )).willReturn( this.buildAccountInfoDto().getConta() );
 			BDDMockito.given(accountFormat.formatBalance(String.valueOf(this.buildAccountInfoDto().getSaldo()))).willReturn(this.buildAccountInfoDto().getSaldo());
@@ -68,7 +68,6 @@ class CsvServiceImplTest {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -76,7 +75,7 @@ class CsvServiceImplTest {
 	@Test
 	void testGetResultFileRead() {
 		String inputFilePath = System.getProperty("user.dir").concat("\\src\\test\\resources\\test.csv");
-		FileInputStream fileInputStream= csvServiceImpl.getResultFileRead(inputFilePath);
+		FileInputStream fileInputStream= csvServiceImpl.getResultFileInputStream(inputFilePath);
 		assertThat(Objects.nonNull(fileInputStream));
 	}
 	

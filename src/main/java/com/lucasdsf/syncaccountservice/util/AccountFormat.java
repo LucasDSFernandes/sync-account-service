@@ -5,13 +5,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.lucasdsf.syncaccountservice.config.PropertiesFiles;
+import com.lucasdsf.syncaccountservice.config.PropertiesFile;
 
 @Component
 public class AccountFormat {
 	
 	@Autowired
-	PropertiesFiles properties;
+	PropertiesFile properties;
 	
 	public String formatAgency(String agency) {
 		if (!(agency.length() == properties.getAgencyLength()) ) {

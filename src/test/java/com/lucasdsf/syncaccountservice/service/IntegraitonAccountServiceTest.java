@@ -22,12 +22,10 @@ class IntegraitonAccountServiceTest {
 	void testUpgradingFromCentralBanckAccount() {
 		ReceitaService receitaService = new ReceitaService();
 		boolean isUpdate =  false;
-//		accountInfoDTO.setProcessedStatus(AccountUpdateStatusEnum.);
 		try {
 			isUpdate = receitaService.atualizarConta(buildAccountInfoDto().getAgencia(), buildAccountInfoDto().getConta(), 
 					buildAccountInfoDto().getSaldo(), buildAccountInfoDto().getStatus().name());
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -38,12 +36,10 @@ class IntegraitonAccountServiceTest {
 		ReceitaService receitaService = new ReceitaService();
 
 		boolean isUpdate =  false;
-//		accountInfoDTO.setProcessedStatus(AccountUpdateStatusEnum.);
 		try {
 			isUpdate = receitaService.atualizarConta(null, buildAccountInfoDto().getConta(), 
 					buildAccountInfoDto().getSaldo(), buildAccountInfoDto().getStatus().name());
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

@@ -1,10 +1,7 @@
 package com.lucasdsf.syncaccountservice;
 
-import java.lang.reflect.InvocationTargetException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Objects;
-import java.util.concurrent.Executor;
+
+import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,14 +9,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.jmx.access.InvocationFailureException;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import com.lucasdsf.syncaccountservice.constants.Constants;
+import com.lucasdsf.syncaccountservice.config.PropertiesFile;
 import com.lucasdsf.syncaccountservice.services.account.impl.SyncAccountServiceImpl;
+
 
 @SpringBootApplication
 @EnableAsync
@@ -28,7 +23,7 @@ import com.lucasdsf.syncaccountservice.services.account.impl.SyncAccountServiceI
 public class SyncAccountServiceApplication {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SyncAccountServiceApplication.class);
-
+	
 	/*
 	 * Este microservico poderia ser uma classe de um microServico Scheduler, onde
 	 * ficaria mais automatizado. Exemplo de segunda a sexta, apartir das 6hrs as
@@ -38,27 +33,22 @@ public class SyncAccountServiceApplication {
 	 * @Scheduled(cron = "0 0 6-9 * * MON-FRI", zone = "America/Sao_Paulo")
 	 */
 
-	@Bean(name = "asyncExecutor")
-	public Executor asyncExecutor() {
-		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(10);
-		executor.setMaxPoolSize(10);
-		executor.setQueueCapacity(1500);
-		executor.initialize();
-		return executor;
-	}
+	/* 
+	 *  Poderia ter profiles configurado no application.yml de ambiente, 
+	 *  Para adicionar no args o caminho apontado no profile de dev no VM Arguments: -Dspring.profiles.active=dev
+	 *  Como exemplo: 
+	 *  
+	 *  PropertiesFile propertiesFile= applicationContext.getBean(PropertiesFile.class);
+	 *  args[0]= System.getProperty("user.dir").concat(propertiesFile.getOutputFilePath());
+	 *  
+	 * */
 
 	public static void main(String[] args) {
 		SpringApplication springApplication = new SpringApplication(SyncAccountServiceApplication.class);
 		ApplicationContext applicationContext = springApplication.run(args);
 		SyncAccountServiceImpl accountUpdateService = applicationContext.getBean(SyncAccountServiceImpl.class);
-
 		long start = System.currentTimeMillis();
 
-//		TODO Poderia ter profiles configurado no application.yml de ambiente, 
-//		para usar a linha a baixo so era apontar para o profile de desenv
-
-//		String inputPathFile = System.getProperty("user.dir").concat("\\src\\main\\resources\\files\\accounts-receita.csv");
 		if(args.length>0) {
 			String inputPathFile = args[0];
 			accountUpdateService.executeProcessFile(inputPathFile);
@@ -75,7 +65,7 @@ public class SyncAccountServiceApplication {
 	}
 
 	private static void shutiingDown(ApplicationContext applicationContext) {
-		LOGGER.info("Realizing shutdown Application!");
+		LOGGER.info("Realizing Shutting down!");
 		SpringApplication.exit(applicationContext);
 		System.exit(0);
 	}

@@ -19,23 +19,28 @@ public class SyncAccountServiceImpl implements SyncAccountService {
 
 	@Autowired
 	private FileUtils fileUtil;
-	
+
 	@Override
 	public void executeProcessFile(String inputPathFile) {
-		FilesService fileService = fileUtil.putStrategyFile().getFile(inputPathFile);
+		FilesService fileService = fileUtil.putStrategyFile().getStrategyFile(inputPathFile);
 		if(Objects.nonNull(fileService)){
-			FileInputStream fileInputStream = fileService.getResultFileRead(inputPathFile);
+			
+			FileInputStream fileInputStream = fileService.getResultFileInputStream(inputPathFile);
 			if ( Objects.nonNull(fileInputStream) ) {
 				fileService.processFile(fileInputStream);
-				try {
-					fileInputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				closeFile(fileInputStream);
 			} 
 		}else {
 			LOGGER.error("File not found or incompatible file extension.");
 		}
 
+	}
+
+	private void closeFile(FileInputStream fileInputStream) {
+		try {
+			fileInputStream.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -6,6 +6,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -20,7 +22,7 @@ import org.springframework.stereotype.Component;
 
 import com.google.common.base.Strings;
 import com.lucasdsf.syncaccountservice.builders.AccountBuilder;
-import com.lucasdsf.syncaccountservice.config.PropertiesFiles;
+import com.lucasdsf.syncaccountservice.config.PropertiesFile;
 import com.lucasdsf.syncaccountservice.constants.Constants;
 import com.lucasdsf.syncaccountservice.dto.AccountInfoDTO;
 import com.lucasdsf.syncaccountservice.enums.AccountStatusEnum;
@@ -37,7 +39,7 @@ public class CsvServiceImpl implements FilesService{
 	@Autowired
 	private FileUtils fileUtils;
 	@Autowired
-	private PropertiesFiles properties;
+	private PropertiesFile properties;
 	@Autowired
 	private AccountFormat accountFormat;
 
@@ -46,39 +48,53 @@ public class CsvServiceImpl implements FilesService{
 	 * Cada Thread pega uma linha, transforma os valores em objeto de Conta, mandava atualizar, escreve no arquivo de saida o resultado, e assim encerra o fluxo, 
 	 * ate pegar outra linha.
 
-	 * Poderia ser dividido em dois fluxos das Threads:,
-	 *  .primeiro leria e transformava a linha do arquivo de entrada em Lista de objeto, encerra fluxo. Ate pegar outra linha e repetir
-	 *  .segundo pegava a lista feita acima, e cada Thread pegava um objeto da lista em pararelo chamava o servico de atualizar 
-	 *  e depois salvava no arquivo de saida, encerra o fluxo e pega o proximo Objeto da lista -> poderia ser utilizando assincrono.
+	 * Poderia ser feito em apenas um unico fluxoo das Threads :,
+	 * 1 ->  Em um mesmo loop em paralelo cada Thread Pega uma linha do arquivo Csv, valida o formato, manda atualizar no serviço de ReceitaService.
+	 * 2 -> Ao obter a resposta do servico externo, escreve o resultado juntos com os dados da conta em um novo arquivo. 
+	 * Para esse fluxo o loop ficaria muito carregado pois faria desde o processo de ler o arquivo, 
+	 * chamar e aguardar o servico de atualizar conta, ate escrever em um arquivo novo.
+	 * 
+	 * Dividir em dois loops.
+	 *  .1º loop: Em paralelo, cada thread pegava uma linha do Csv e adiciova em Lista de um objeto de conta.
+	 *  .2º loop: Em paralelo, cada Thread pegava um objeto da lista feita acima, chamava o servico de atualizar 
+	 *  e depois salvava no arquivo de saida, encerra o fluxo e pega o proximo Objeto da lista 
+	 *  . O 2º loop poderia ser assincrono.
 	 * */
 	@Override
 	public boolean processFile(FileInputStream fileInputStream) {
 		LOGGER.info("Initializing file process");
+		List<AccountInfoDTO> accountsInfoDto = new ArrayList<>();
 		boolean isProcessed = false;
-		CSVParser inputFileStreamCsvParser = parseImputStreamCSV(fileInputStream);
-		String outputFilePath = fileUtils.createOutputFile(properties.getOutputFileName(),
-				properties.getOutputFileExtension());
 
+		CSVParser csvParser = convertFileInputStreamToCsvParser(fileInputStream);
+		String outputFilePath = fileUtils.getOutputFilePath(properties.getOutputFileName(), properties.getOutputFileExtension());
+		
+		convertCsvParserToListAccountsInfo(accountsInfoDto, csvParser);
+		
 		try (FileWriter fileWriter = new FileWriter(new File(outputFilePath));) {
-			fileUtils.appenndeWriterFile(fileWriter, getCsvHeader());
-
-			inputFileStreamCsvParser.getRecords().parallelStream().filter(c -> c.getRecordNumber() > 1)
-					.forEach(csvRecord -> {
-						try {
-							LOGGER.info("Building the CSV body. Linha: {}. Thread Current: {}",
-									csvRecord.getRecordNumber(), Thread.currentThread().getName());
-							setCsvBody(csvRecord, fileWriter);
-						} catch (IOException e) {
-						}
-					});
-
+			csvHeaderWriter(fileWriter);
+			csvBodyWriter(fileWriter, accountsInfoDto);
+			
 			fileWriter.flush();
-			fileWriter.close();
 			isProcessed = true;
 		} catch (Exception e) {
 			LOGGER.error("Error na gravação do arquivo Csv");
 		}
 		return isProcessed;
+	}
+
+	private void convertCsvParserToListAccountsInfo(List<AccountInfoDTO> accountsInfoDto, CSVParser csvParser) {
+		try {
+			csvParser.getRecords().parallelStream()
+			.filter(c -> c.getRecordNumber() > 1)
+			.forEach(csvRecord -> formatAccount(csvRecord, accountsInfoDto)	);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void csvHeaderWriter(FileWriter fileWriter) throws IOException {
+		fileUtils.appendFile(fileWriter, getCsvHeader());
 	}
 
 	private String getCsvHeader() {
@@ -89,7 +105,7 @@ public class CsvServiceImpl implements FilesService{
 	 *    Ao carregar o CSV pode ser tanto processando linha a linha ou mandar uma so lista para processamento
 	 * */
 	@Override
-	public FileInputStream getResultFileRead(String inputFilePath) {
+	public FileInputStream getResultFileInputStream(String inputFilePath) {
 		LOGGER.info("Initializing file reading");
 		FileInputStream fileInputStream = null;
 		if ( !Strings.isNullOrEmpty(inputFilePath) ) {
@@ -105,30 +121,37 @@ public class CsvServiceImpl implements FilesService{
 		return fileInputStream;
 	}
 	
-	public CSVParser parseImputStreamCSV(InputStream fileInputStream) {
+	public CSVParser convertFileInputStreamToCsvParser(InputStream fileInputStream) {
 		try {
 			LOGGER.info("Converting file to CSV format.");
 			return CSVFormat.EXCEL.withDelimiter(';').parse(new InputStreamReader(fileInputStream));
 		} catch (IOException e) {
 			LOGGER.error("Error converting to CSV file.");
-			LOGGER.error("Exception cause -> {} ", e.getCause());
+			LOGGER.error("Exception cause: {} ", e.getMessage());
 		}
 		return null ;
 	}
 	
-	private void setCsvBody(CSVRecord csvRecord, FileWriter fileWriter) throws IOException {
-		AccountInfoDTO accountData = formatAccount(csvRecord);
+	private void csvBodyWriter(FileWriter fileWriter, List<AccountInfoDTO> accountsInfoDto) {
 		
-		if(Objects.nonNull(accountData)) {
+		if(Objects.nonNull(accountsInfoDto) && !accountsInfoDto.isEmpty()) {
 			IntegrationAccountService integrationAccount = new IntegrationAccountService();
-			integrationAccount.upgradingFromCentralBanckAccount(accountData);
-			
-			fileUtils.appenndeWriterFile(fileWriter, appendLineToCsvFile(accountData));
+			accountsInfoDto.parallelStream().forEach(accountInfoDto -> {
+				writerCsvFile(fileWriter, accountInfoDto);
+				integrationAccount.upgradingFromCentralBanckAccount(accountInfoDto);
+			});
+		}
+	}
+
+	private void writerCsvFile(FileWriter fileWriter, AccountInfoDTO accountInfoDto) {
+		try {
+			fileUtils.appendFile(fileWriter, buildCsvFileLine(accountInfoDto));
+		} catch (IOException e) {
+			LOGGER.error("Error writing csv file body");
 		}
 	}
 	
-	private String appendLineToCsvFile(AccountInfoDTO accountData) {
-		
+	private String buildCsvFileLine(AccountInfoDTO accountData) {
 		StringBuilder csvStringBuilder=  new StringBuilder();
 		csvStringBuilder.append(accountData.getAgencia());
 		csvStringBuilder.append(Constants.CSV_SEPARATOR);
@@ -146,26 +169,28 @@ public class CsvServiceImpl implements FilesService{
 		return csvStringBuilder.toString();
 	}
 	
-	private AccountInfoDTO formatAccount( CSVRecord csvRecord) {
+	private List<AccountInfoDTO> formatAccount( CSVRecord csvRecord, List<AccountInfoDTO> accountsInfoDto) {
 		String agency = csvRecord.get(AccountFileEnum.AGENCY.getIndex());
 		String account = csvRecord.get(AccountFileEnum.ACCOUNT.getIndex());
 		String balance = csvRecord.get(AccountFileEnum.BALANCE.getIndex());
 		String status = csvRecord.get(AccountFileEnum.STATUS.getIndex());
-		AccountInfoDTO accountInfoDTO = null;
+		AccountInfoDTO accountInfoDto = null;
 		try {
-			if (!Strings.isNullOrEmpty(status) && !Strings.isNullOrEmpty(balance) && !Strings.isNullOrEmpty(account) && !Strings.isNullOrEmpty(agency)) {
+			if (!Strings.isNullOrEmpty(status) && !Strings.isNullOrEmpty(balance) && !Strings.isNullOrEmpty(account)
+					&& !Strings.isNullOrEmpty(agency)) {
 				LOGGER.info("Formatting the contents of the CSV file body");
-				accountInfoDTO = AccountBuilder.getInstance().setAgency(accountFormat.formatAgency(agency))
+				accountInfoDto = AccountBuilder.getInstance().setAgency(accountFormat.formatAgency(agency))
 						.setAccount(accountFormat.formatAccount(account))
 						.setBalance(accountFormat.formatBalance(balance))
 						.setStatus(AccountStatusEnum.getByValue(status))
 						.build();
+				accountsInfoDto.add(accountInfoDto);
 			}else {
 				LOGGER.info("Content is empty or null");
 			}
 		} catch (Exception e) {
 			LOGGER.error("Error formatting content");
 		}
-		return accountInfoDTO;
+		return accountsInfoDto;
 	}
 }

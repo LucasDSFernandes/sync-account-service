@@ -2,6 +2,7 @@ account:
   file:
     path: /file-account 
     extension: .csv
+   
   formats-length:
     agency: 4
     account: 6
@@ -9,3 +10,21 @@ account:
 #  output:
 #    ansi:
 #      enabled: always
+
+---
+###############################
+spring:
+  application:
+    name: sync-account-prod
+  profiles: prod
+
+---
+###############################
+
+spring:
+  application:
+    name: sync-account-dev
+  profiles: dev
+account:
+  file:
+   outputFilePath: "//src//main//resources//files//accounts-receita.csv"

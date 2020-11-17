@@ -1,7 +1,6 @@
 package com.lucasdsf.syncaccountservice.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -12,14 +11,14 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.lucasdsf.syncaccountservice.config.PropertiesFiles;
+import com.lucasdsf.syncaccountservice.config.PropertiesFile;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ActiveProfiles(value = "test")
 class AccountFormatTest {
 	@MockBean
-	PropertiesFiles properties;
+	PropertiesFile properties;
 	
 	@Autowired
 	AccountFormat accountFormat;

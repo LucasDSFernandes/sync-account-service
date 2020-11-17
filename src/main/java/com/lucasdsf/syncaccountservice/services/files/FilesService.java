@@ -4,5 +4,5 @@ import java.io.FileInputStream;
 
 public interface FilesService {
 	boolean processFile(FileInputStream fileInputStream);
-	FileInputStream getResultFileRead(String inputFilePath);
+	FileInputStream getResultFileInputStream(String inputFilePath);
 }

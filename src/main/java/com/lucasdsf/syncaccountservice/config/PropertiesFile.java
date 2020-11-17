@@ -4,13 +4,16 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PropertiesFiles {
+public class PropertiesFile {
 	
 	@Value("${account.formats-length.agency}")
 	private int accountAgencyLength;
 	
 	@Value("${account.formats-length.account}")
 	private int accountLength;
+	
+	@Value("${account.file.outputFilePath}")
+	private String outputFilePath;
 	
 	@Value("${account.file.path}")
 	private String outputFileName;
@@ -33,5 +36,8 @@ public class PropertiesFiles {
 	public String getOutputFileExtension() {
 		return outputFileExtension;
 	}
-	
+
+	public String getOutputFilePath() {
+		return outputFilePath;
+	}
 }

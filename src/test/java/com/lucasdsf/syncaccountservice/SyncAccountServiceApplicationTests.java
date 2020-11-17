@@ -1,5 +1,7 @@
 package com.lucasdsf.syncaccountservice;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,6 +15,7 @@ class SyncAccountServiceApplicationTests {
 
 	@Test
 	void testMain() {
+		assertThat(true);
 	}
 
 }

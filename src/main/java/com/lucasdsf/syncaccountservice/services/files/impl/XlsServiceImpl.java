@@ -17,7 +17,7 @@ public class XlsServiceImpl implements FilesService{
 		return false;
 	}
 	@Override
-	public FileInputStream getResultFileRead(String inputFilePath) {
+	public FileInputStream getResultFileInputStream(String inputFilePath) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -1,15 +1,12 @@
 package com.lucasdsf.syncaccountservice.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-import org.apache.commons.io.FilenameUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +15,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.lucasdsf.syncaccountservice.config.PropertiesFiles;
-import com.lucasdsf.syncaccountservice.services.files.FilesService;
 import com.lucasdsf.syncaccountservice.services.files.impl.CsvServiceImpl;
 
 @RunWith(SpringRunner.class)
@@ -35,7 +30,7 @@ class FileUtilsTest {
 	
 	@Test
 	void testCreateOutputFile() {
-		String outFilePathFileMock = fileUtil.createOutputFile("/file-account", ".csv");
+		String outFilePathFileMock = fileUtil.getOutputFilePath("/file-account", ".csv");
 		assertThat(outFilePathFileMock.contains("file-account"));
 	}
 	
@@ -46,7 +41,7 @@ class FileUtilsTest {
 		Writer writer = null;
 		try {
 			fileWriter = new FileWriter(new File(outFilePath));
-			writer = fileUtil.appenndeWriterFile(fileWriter, "test");
+			writer = fileUtil.appendFile(fileWriter, "test");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -57,6 +52,6 @@ class FileUtilsTest {
 		String outFilePath = System.getProperty("user.dir").concat("\\src\\test\\resources\\testOut.csv");
 
 		fileUtil = fileUtil.putStrategyFile();
-		assertThat(fileUtil.getFile(outFilePath) == csvServiceImplMock);
+		assertThat(fileUtil.getStrategyFile(outFilePath) == csvServiceImplMock);
 	}
 }
