@@ -56,10 +56,10 @@ public class FileUtils {
 	}
 	
 	/*
-	 * 1 - Codigo generico para caso no futuro precisar usar uma outra extenção,  adicionar uma put no map com 
-	 * 		Key -> extenção do arquivo 
-	 * 		Value -> instancia da classe da extenção
-	 * 2 - Implementar regra na classe da extenção
+	 * 1 - Para caso no futuro precisar usar uma outra extenção de arquivo,  basta adicionar uma put no map com: 
+     *      Key -> extenção do arquivo 
+     *      Value -> instancia da classe da extenção
+     * 2 - Implementar regra na classe da extenção
 	 * 
 	 * Exemplo:
 	 * fileStrategyMap.put("xls", xlsServiceImpl );
