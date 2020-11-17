@@ -35,19 +35,21 @@ public class IntegrationAccountService  {
 			            .options(new Options(60000, 60000)) -> teria dois confs de timeout como read Timeout e conection Timeout, nesse caso utilizaria 6000ms ou 6seg de cada.
 						.encoder(new JacksonEncoder()) -> serializar a comunicação entre os ms usando JacksonEncoder
 						.decoder(new JacksonDecoder()) -> desserializar a comunicação entre os ms usando JcksonDecoder
-						.errorDecoder(new StashErrorDecoder()); -> essa classe seria para caso desse erro no ms de Integração cairia nessa classe e teria tratamento de acordo com o codigo do erro(400,401, 500...).
+						.errorDecoder(new ClasseErrorFeign()); -> essa classe seria para caso desse erro no ms de Integração cairia nessa classe e teria tratamento de acordo com o codigo do erro(400,401, 500...).
 			}
-	 * */
-	/*
+
 	 * O tratamento de Status deveria ser feito no micro servico de integração, onde traria o resultado ja prontinho.
+	 * 
 	 * */
 
 	@Async("asyncExecutor")
-	public CompletableFuture<AccountInfoDTO>  upgradingFromCentralBanckAccount(AccountInfoDTO accountInfoDTO) {
+	public CompletableFuture<AccountInfoDTO> updateFromCentralBanckAccount(AccountInfoDTO accountInfoDTO) {
 		try {
 			LOGGER.info("Running service update account.");
+			
 			boolean isUpdated = receitaService.atualizarConta(accountInfoDTO.getAgencia(), accountInfoDTO.getConta(),
 					accountInfoDTO.getSaldo(), accountInfoDTO.getStatus().name());
+			
 			if ( isUpdated ) {
 				LOGGER.info("Return Account update status: {}",  AccountUpdateStatusEnum.UPDATED);
 				accountInfoDTO.setProcessedStatus( AccountUpdateStatusEnum.UPDATED );
@@ -60,7 +62,7 @@ public class IntegrationAccountService  {
 			/*
 			 * Caso de erro em um conta especifica nao irá interromper o fluxo todo, apenas registraria a mensagem de erro que aprensentou para aquela conta;
 			 * */
-			LOGGER.error("Error updating account: {} ", e.getMessage());
+			LOGGER.error("Error updating account: {} ", e.getLocalizedMessage());
 			LOGGER.info("Return Account update status: {}",  AccountUpdateStatusEnum.ERROR_UPDATE);
 			accountInfoDTO.setProcessedStatus( AccountUpdateStatusEnum.ERROR_UPDATE );
 			accountInfoDTO.setProcessError( e.getMessage() );

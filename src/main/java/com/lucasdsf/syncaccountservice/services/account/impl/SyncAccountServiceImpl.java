@@ -1,7 +1,5 @@
 package com.lucasdsf.syncaccountservice.services.account.impl;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -23,24 +21,13 @@ public class SyncAccountServiceImpl implements SyncAccountService {
 	@Override
 	public void executeProcessFile(String inputPathFile) {
 		FilesService fileService = fileUtil.putStrategyFile().getStrategyFile(inputPathFile);
-		if(Objects.nonNull(fileService)){
-			
-			FileInputStream fileInputStream = fileService.getResultFileInputStream(inputPathFile);
-			if ( Objects.nonNull(fileInputStream) ) {
-				fileService.processFile(fileInputStream);
-				closeFile(fileInputStream);
-			} 
-		}else {
+		
+		if (Objects.nonNull(fileService)) {
+
+			fileService.processFile(inputPathFile);
+		} else {
 			LOGGER.error("File not found or incompatible file extension.");
 		}
 
-	}
-
-	private void closeFile(FileInputStream fileInputStream) {
-		try {
-			fileInputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 }

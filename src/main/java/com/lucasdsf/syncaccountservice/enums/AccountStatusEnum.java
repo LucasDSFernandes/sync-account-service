@@ -4,10 +4,10 @@ import java.util.Arrays;
 
 public enum AccountStatusEnum {
 	
-	A("Ativo"),	I("Inativo"),	B("Blockeada"),	P("Pendente");
+	A("Ativo"),	I("Inativo"), B("Bloqueada"), P("Pendente");
 	
 	AccountStatusEnum(String status){
-		this.setStatus(status);
+		this.status = status;
 	}
 	private String status;
 
@@ -20,9 +20,5 @@ public enum AccountStatusEnum {
 
 	public String getStatus() {
 		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
 	}
 }

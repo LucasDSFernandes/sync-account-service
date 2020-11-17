@@ -36,14 +36,12 @@ public enum AccountFileEnum {
 			.orElse(null);
 	}
 	
-	  public static List<String> getHeadersName() {
-        List<String> listValue = new ArrayList<String>();
-
+	public static List<String> getHeadersName() {
+        List<String> listValue = new ArrayList<>();
         Arrays.stream(AccountFileEnum.values())
 				.forEach(value -> listValue.add(value.getHeaderName()));
 
         return listValue;
     }
-
 	
 }

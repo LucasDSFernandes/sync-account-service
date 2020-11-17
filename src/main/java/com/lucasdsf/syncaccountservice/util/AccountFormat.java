@@ -11,17 +11,17 @@ import com.lucasdsf.syncaccountservice.config.PropertiesFile;
 public class AccountFormat {
 	
 	@Autowired
-	PropertiesFile properties;
+	private PropertiesFile properties;
 	
 	public String formatAgency(String agency) {
-		if (!(agency.length() == properties.getAgencyLength()) ) {
+		if (agency.length() != properties.getAgencyLength()) {
 				return StringUtils.leftPad(agency, properties.getAgencyLength(), '0' );
 		}
 		return agency;
 	}
 	
 	public String formatAccount(String account) {
-		if (!( account.length() == properties.getAccountLength() ) ) {
+		if ( account.length() != properties.getAccountLength()) {
 			account = account.replace("-", "");
 			return StringUtils.leftPad( account, properties.getAccountLength(), "0" );
 		} 

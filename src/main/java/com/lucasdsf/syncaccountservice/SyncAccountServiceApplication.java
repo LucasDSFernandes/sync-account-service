@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+import com.lucasdsf.syncaccountservice.config.PropertiesFile;
 import com.lucasdsf.syncaccountservice.services.account.impl.SyncAccountServiceImpl;
 
 
@@ -43,14 +44,15 @@ public class SyncAccountServiceApplication {
 		SpringApplication springApplication = new SpringApplication(SyncAccountServiceApplication.class);
 		ApplicationContext applicationContext = springApplication.run(args);
 		SyncAccountServiceImpl accountUpdateService = applicationContext.getBean(SyncAccountServiceImpl.class);
+		 
 		long start = System.currentTimeMillis();
 
 		if(args.length>0) {
-			String inputPathFile = args[0];
-			accountUpdateService.executeProcessFile(inputPathFile);
+			accountUpdateService.executeProcessFile(args[0]);
 		}else {
 			LOGGER.error("Input parameter not found.");
 		}
+		
 		LOGGER.info("Finalizing account update in {} .", formatTime(System.currentTimeMillis() - start));
 
 		shutiingDown(applicationContext);

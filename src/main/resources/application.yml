@@ -2,6 +2,8 @@ account:
   file:
     path: /file-account 
     extension: .csv
+    file:
+    outputFilePath: ""
    
   formats-length:
     agency: 4
@@ -17,6 +19,9 @@ spring:
   application:
     name: sync-account-prod
   profiles: prod
+account:
+  file:
+   outputFilePath: ""
 
 ---
 ###############################
@@ -25,6 +30,17 @@ spring:
   application:
     name: sync-account-dev
   profiles: dev
+account:
+  file:
+   outputFilePath: "//src//main//resources//files//accounts-receita.csv"
+   
+---
+###############################
+
+spring:
+  application:
+    name: sync-account-dev
+  profiles: test
 account:
   file:
    outputFilePath: "//src//main//resources//files//accounts-receita.csv"

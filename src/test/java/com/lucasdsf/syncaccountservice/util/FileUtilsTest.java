@@ -3,6 +3,7 @@ package com.lucasdsf.syncaccountservice.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -15,6 +16,9 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.lucasdsf.syncaccountservice.constants.Constants;
+import com.lucasdsf.syncaccountservice.dto.AccountInfoDTO;
+import com.lucasdsf.syncaccountservice.enums.AccountStatusEnum;
 import com.lucasdsf.syncaccountservice.services.files.impl.CsvServiceImpl;
 
 @RunWith(SpringRunner.class)
@@ -53,5 +57,28 @@ class FileUtilsTest {
 
 		fileUtil = fileUtil.putStrategyFile();
 		assertThat(fileUtil.getStrategyFile(outFilePath) == csvServiceImplMock);
+	}
+	
+	@Test
+	void testGetResultFileInputStream() {
+		String filePath = System.getProperty("user.dir").concat("\\src\\test\\resources\\testOut.csv");
+		FileInputStream fileInputStream  = fileUtil.getResultFileInputStream(filePath);
+		fileUtil.closeFile(fileInputStream);
+		assertThat(fileInputStream !=null);
+	}
+
+	@Test
+	void testBuildFileLine() {
+		String fileInputStream  = fileUtil.buildFileLine(buildAccountInfoDto(), Constants.CSV_SEPARATOR);
+		assertThat(fileInputStream !=null);
+	}
+	
+	private AccountInfoDTO buildAccountInfoDto() {
+		AccountInfoDTO accountInfoDTO = new AccountInfoDTO();
+		accountInfoDTO.setAgencia("1234");
+		accountInfoDTO.setConta("123456");
+		accountInfoDTO.setSaldo(20.2);
+		accountInfoDTO.setStatus(AccountStatusEnum.A);
+		return accountInfoDTO;
 	}
 }

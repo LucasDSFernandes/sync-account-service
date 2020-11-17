@@ -1,14 +1,18 @@
 package com.lucasdsf.syncaccountservice.integrations;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
+/**
+ * @author gabriel_stabel<gabriel_stabel@sicredi.com.br>
+ */
 public class ReceitaService {
 
+
     public boolean atualizarConta(String agencia, String conta, double saldo, String status)
-            throws InterruptedException {
+            throws RuntimeException, InterruptedException {
 		
+			
         // Formato agencia: 0000
         if (agencia == null || agencia.length() != 4) {
             return false;
@@ -20,13 +24,17 @@ public class ReceitaService {
         }
         
         // Tipos de status validos:
-        List<String> tipos = Lists.newArrayList("A", "I", "B", "P");
+        List tipos = new ArrayList();
+        tipos.add("A");
+        tipos.add("I");
+        tipos.add("B");
+        tipos.add("P");                
                 
         if (status == null || !tipos.contains(status)) {
             return false;
         }
-        
-//         Simula tempo de resposta do serviço (entre 1 e 5 segundos)
+
+        // Simula tempo de resposta do serviço (entre 1 e 5 segundos)
         long wait = Math.round(Math.random() * 4000) + 1000;
         Thread.sleep(wait);
 
@@ -35,7 +43,7 @@ public class ReceitaService {
         if (randomError == 500) {
             throw new RuntimeException("Error");
         }
-        
+
         return true;
     }
 }

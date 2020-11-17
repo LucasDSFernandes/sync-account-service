@@ -1,13 +1,9 @@
 package com.lucasdsf.syncaccountservice.service.files.impl;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -49,37 +45,27 @@ class CsvServiceImplTest {
 	void testProcessFile() {
 		String inputFilePath = System.getProperty("user.dir").concat("\\src\\test\\resources\\test.csv");
 		String outFilePath = System.getProperty("user.dir").concat("\\src\\test\\resources\\testOut.csv");
-		FileInputStream fileInputStream;
 		try {
-			fileInputStream = new FileInputStream( new File(inputFilePath));
-			
+			FileInputStream fileInputStream = new FileInputStream( new File(inputFilePath));;
 			BDDMockito.given(propertiesMock.getOutputFileName()).willReturn("testOut");
 			BDDMockito.given(propertiesMock.getOutputFileExtension()).willReturn("csv");
+			BDDMockito.given(fileUtilMock.getResultFileInputStream(inputFilePath)).willReturn(fileInputStream);
 			
 			BDDMockito.given(fileUtilMock.getOutputFilePath("testOut", "csv")).willReturn(outFilePath);
 			
-			FileWriter fileWriter = new FileWriter(new File(outFilePath));
-			BDDMockito.given(fileUtilMock.appendFile(fileWriter, getCsvHeader())).willReturn(fileWriter);
+			
+				FileWriter fileWriter = new FileWriter(new File(outFilePath));
+				BDDMockito.given(fileUtilMock.appendFile(fileWriter, getCsvHeader())).willReturn(fileWriter);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			BDDMockito.given(accountFormat.formatAgency( this.buildAccountInfoDto().getAgencia() )).willReturn( this.buildAccountInfoDto().getAgencia() );
 			BDDMockito.given(accountFormat.formatAccount( this.buildAccountInfoDto().getConta() )).willReturn( this.buildAccountInfoDto().getConta() );
 			BDDMockito.given(accountFormat.formatBalance(String.valueOf(this.buildAccountInfoDto().getSaldo()))).willReturn(this.buildAccountInfoDto().getSaldo());
 			
-			csvServiceImpl.processFile(fileInputStream);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+			csvServiceImpl.processFile(inputFilePath);
 	}
 
-	@Test
-	void testGetResultFileRead() {
-		String inputFilePath = System.getProperty("user.dir").concat("\\src\\test\\resources\\test.csv");
-		FileInputStream fileInputStream= csvServiceImpl.getResultFileInputStream(inputFilePath);
-		assertThat(Objects.nonNull(fileInputStream));
-	}
-	
-	
 	private String getCsvHeader() {
 		return AccountFileEnum.getHeadersName().stream().collect(Collectors.joining(Constants.CSV_SEPARATOR)).concat(Constants.NEW_LINE_FUNCTION);
 	}
