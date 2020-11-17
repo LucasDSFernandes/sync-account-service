@@ -18,15 +18,12 @@ import org.springframework.stereotype.Component;
 import com.lucasdsf.syncaccountservice.constants.Constants;
 import com.lucasdsf.syncaccountservice.services.files.FilesService;
 import com.lucasdsf.syncaccountservice.services.files.impl.CsvServiceImpl;
-import com.lucasdsf.syncaccountservice.services.files.impl.XlsServiceImpl;
 
 @Component
 public class FileUtils {
 	private static final Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
 	@Autowired 
 	private	CsvServiceImpl csvServiceImpl;
-	@Autowired 
-	private XlsServiceImpl xlsServiceImpl;
 	
 	Map<String, FilesService> fileStrategyMap = new HashMap<>();;
 	
@@ -63,11 +60,15 @@ public class FileUtils {
 	 * 		Key -> extenção do arquivo 
 	 * 		Value -> instancia da classe da extenção
 	 * 2 - Implementar regra na classe da extenção
+	 * 
+	 * Exemplo:
+	 * fileStrategyMap.put("xls", xlsServiceImpl );
+	 * fileStrategyMap.put("xlsx", xlsxServiceImpl );
+	 * fileStrategyMap.put("txt", txtServiceImpl );
 	 * */
 	
 	public FileUtils putStrategyFile() {
 		fileStrategyMap.put("csv", csvServiceImpl );
-		fileStrategyMap.put("xls", xlsServiceImpl );
 		return this;
 	}
 
