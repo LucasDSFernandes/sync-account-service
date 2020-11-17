@@ -24,6 +24,31 @@ Exemplo:
     1 - Import o ms na Ide de sua preferencia.
     2 - Para rodar local existe uma planilha no caminho sync-account-service\src\main\resources\files, 
     pegar o caminho e trocar pelo parametro do imput dentro da class aplication do micro serviço.
+    3 - Caso deseje apontar para a planilha do micro serviço basta adicionar no args o caminho apontado no profile de dev no VM Arguments: -Dspring.profiles.active=dev
+	  Como exemplo: 
+	   
+	  PropertiesFile propertiesFile= applicationContext.getBean(PropertiesFile.class);
+	  args[0]= System.getProperty("user.dir").concat(propertiesFile.getOutputFilePath());
+      
+      Obs.: Caso não coloque e queira testar local, dará um erro, que não encontrou a configuração {account.file.outputFilePath} .
+  
+   *Exemplo de como ficaria o metodo main:*
+   
+  ![image](https://user-images.githubusercontent.com/33759918/99461825-3e386c00-2911-11eb-91b6-c6674c4ae3ea.png)
+
+    
+### Utilização do strategy
+    
+     1 - Para caso no futuro precisar usar uma outra extenção de arquivo,  basta adicionar uma put no map com 
+            Key -> extenção do arquivo 
+            Value -> instancia da classe da extenção de arquivo 
+     2 - Implementar regra na classe da extenção de arquivo 
+     3 - A nova classe de implementação do service criado deve implementar a interface FileService.
+     
+     Exemplos:
+     fileStrategyMap.put("xls", xlsServiceImpl );
+     fileStrategyMap.put("xlsx", xlsxServiceImpl );
+     fileStrategyMap.put("txt", txtServiceImpl );
 
 ### Coverage de classe de test
  Plugin Coverage do Eclipse Ide
