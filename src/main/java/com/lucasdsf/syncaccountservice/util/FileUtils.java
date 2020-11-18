@@ -80,6 +80,7 @@ public class FileUtils {
      *      Key -> extenção do arquivo 
      *      Value -> instancia da classe da extenção
      * 2 - Implementar regra na classe da extenção
+     * 3 - A nova classe de implementação do service criado deve implementar a interface FilesService.
 	 * 
 	 * Exemplo:
 	 * fileStrategyMap.put("xls", xlsServiceImpl );

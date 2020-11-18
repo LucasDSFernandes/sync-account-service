@@ -24,7 +24,7 @@ public class ReceitaService {
         }
         
         // Tipos de status validos:
-        List tipos = new ArrayList();
+        List<String> tipos = new ArrayList<>();
         tipos.add("A");
         tipos.add("I");
         tipos.add("B");

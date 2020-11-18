@@ -9,7 +9,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-import com.lucasdsf.syncaccountservice.config.PropertiesFile;
 import com.lucasdsf.syncaccountservice.services.account.impl.SyncAccountServiceImpl;
 
 
@@ -55,14 +54,14 @@ public class SyncAccountServiceApplication {
 		
 		LOGGER.info("Finalizing account update in {} .", formatTime(System.currentTimeMillis() - start));
 
-		shutiingDown(applicationContext);
+		shutDown(applicationContext);
 	}
 
 	private static String formatTime(long timeMilis) {
 		return String.format("%02d:%02d:%02d", timeMilis / 3600000, timeMilis / 60000, timeMilis / 1000);
 	}
 
-	private static void shutiingDown(ApplicationContext applicationContext) {
+	private static void shutDown(ApplicationContext applicationContext) {
 		LOGGER.info("Realizing Shutting down!");
 		SpringApplication.exit(applicationContext);
 		System.exit(0);

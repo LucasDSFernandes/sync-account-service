@@ -1,0 +1,32 @@
+{"properties": [
+  {
+    "name": "account.file.path",
+    "type": "java.lang.String",
+    "description": "A description for 'account.file.path'"
+  },
+  {
+    "name": "account.file.extension",
+    "type": "java.lang.String",
+    "description": "A description for 'account.file.extension'"
+  },
+  {
+    "name": "account.file.file",
+    "type": "java.lang.String",
+    "description": "A description for 'account.file.file'"
+  },
+  {
+    "name": "account.file.outputFilePath",
+    "type": "java.lang.String",
+    "description": "A description for 'account.file.outputFilePath'"
+  },
+  {
+    "name": "account.formats-length.agency",
+    "type": "java.lang.String",
+    "description": "A description for 'account.formats-length.agency'"
+  },
+  {
+    "name": "account.formats-length.account",
+    "type": "java.lang.String",
+    "description": "A description for 'account.formats-length.account'"
+  }
+]}

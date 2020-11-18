@@ -39,7 +39,7 @@ account:
 
 spring:
   application:
-    name: sync-account-dev
+    name: sync-account-test
   profiles: test
 account:
   file:

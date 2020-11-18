@@ -43,7 +43,7 @@ Exemplo:
             Key -> extenção do arquivo 
             Value -> instancia da classe da extenção de arquivo 
      2 - Implementar regra na classe da extenção de arquivo 
-     3 - A nova classe de implementação do service criado deve implementar a interface FileService.
+     3 - A nova classe de implementação do service criado deve implementar a interface FilesService.
      
      Exemplos:
      fileStrategyMap.put("xls", xlsServiceImpl );
